@@ -625,6 +625,7 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         tsserver = {},
+        denols = {},
         --
         elixirls = {},
 
@@ -661,6 +662,7 @@ require('lazy').setup({
         })
         require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+        local lspconfig = require 'lspconfig'
         require('mason-lspconfig').setup {
           handlers = {
             function(server_name)
@@ -669,7 +671,27 @@ require('lazy').setup({
               -- by the server configuration above. Useful when disabling
               -- certain features of an LSP (for example, turning off formatting for tsserver)
               server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-              require('lspconfig')[server_name].setup(server)
+              lspconfig[server_name].setup(server)
+            end,
+            ['tsserver'] = function()
+              local server_name = 'tsserver'
+              local server = servers[server_name] or {}
+              server.root_dir = function(fname)
+                -- Use the default root pattern search, but include package.json
+                return lspconfig.util.root_pattern 'package.json'(fname)
+              end
+              server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+              lspconfig[server_name].setup(server)
+            end,
+            ['denols'] = function()
+              local server_name = 'denols'
+              local server = servers[server_name] or {}
+              server.root_dir = function(fname)
+                -- Use the default root pattern search, but include package.json
+                return lspconfig.util.root_pattern 'deno.json'(fname)
+              end
+              server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+              lspconfig[server_name].setup(server)
             end,
           },
         }
