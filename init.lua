@@ -129,6 +129,12 @@ vim.opt.undofile = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
+-- Indent smartly
+vim.o.expandtab = true
+vim.o.smartindent = true
+vim.o.tabstop = 2
+vim.o.shiftwidth = 2
+
 -- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
 
